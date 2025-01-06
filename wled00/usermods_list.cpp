@@ -11,6 +11,8 @@
  */
 //#include "../usermods/EXAMPLE_v2/usermod_v2_example.h"
 
+#include "../usermods/Presense/presense_usermod.h"
+
 #ifdef USERMOD_BATTERY
   #include "../usermods/Battery/usermod_v2_Battery.h"
 #endif
@@ -255,6 +257,8 @@ void registerUsermods()
    * \/ \/ \/
    */
   //UsermodManager::add(new MyExampleUsermod());
+
+  UsermodManager::add(new PresenseUsermod());
 
   #ifdef USERMOD_BATTERY
   UsermodManager::add(new UsermodBattery());
