@@ -60,6 +60,7 @@ private:
         currentTime - radarTimer > radarTimeout)
     {
       humanPresentFlag = false;
+      radarTimer = currentTime;
     }
 
     return humanPresentFlag;
