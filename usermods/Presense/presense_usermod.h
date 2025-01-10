@@ -13,7 +13,7 @@ private:
   const float BRIGHTNESS_CONSTANT = 0.5;
   const unsigned long LOOP_DELAY = 1000;
   const unsigned long AMBIENT_LIGHT_CHECK_DELAY = 1000;
-  const unsigned long RADAR_CHECK_DELAY = 1000;
+  const unsigned long RADAR_CHECK_DELAY = 100;
   float ambientLight = 0;
   bool enabled = true;
   unsigned long lastRadarRunCheck = 0;
