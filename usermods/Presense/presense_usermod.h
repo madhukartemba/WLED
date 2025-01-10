@@ -25,11 +25,7 @@ private:
 
   void refreshRadar()
   {
-    if (millis() - lastRadarRunCheck > RADAR_CHECK_DELAY)
-    {
-      radar.run();
-      lastRadarRunCheck = millis();
-    }
+    radar.run();
   }
 
   boolean isDark()
@@ -52,10 +48,18 @@ private:
 
   bool isHumanPresent()
   {
-    if (millis() - radarTimer > radarTimeout)
+    bool presence = radar.isHumanPresent();
+    unsigned long currentTime = millis();
+
+    if (presence)
     {
-      humanPresentFlag = radar.isHumanPresent();
-      radarTimer = millis();
+      radarTimer = currentTime;
+      humanPresentFlag = true;
+    }
+    else if (
+        currentTime - radarTimer > radarTimeout)
+    {
+      humanPresentFlag = false;
     }
 
     return humanPresentFlag;
