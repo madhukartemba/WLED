@@ -2,21 +2,35 @@
 
 #include "wled.h"
 #include <APDS9930.h>
-#include "RD_03E.h"
+#include <RD_03E.h>
 
 class PresenseUsermod : public Usermod
 {
 private:
   APDS9930 apds = APDS9930();
-  RD_O3E radar = RD_O3E();
+  RD_03E radar = RD_03E(Serial1);
   const float THRESHOLD_BRIGHTNESS = 15;
   const float BRIGHTNESS_CONSTANT = 0.5;
   const unsigned long LOOP_DELAY = 1000;
   const unsigned long AMBIENT_LIGHT_CHECK_DELAY = 1000;
+  const unsigned long RADAR_CHECK_DELAY = 1000;
   float ambientLight = 0;
-  bool enabled = true; // Usermod is enabled by default
-  unsigned long lastCheck = 0;
+  bool enabled = true;
+  unsigned long lastRadarRunCheck = 0;
   unsigned long lastAmbientLightCheck = 0;
+
+  unsigned long radarTimer = 0;
+  bool humanPresentFlag = false;
+  unsigned long radarTimeout = 10000;
+
+  void refreshRadar()
+  {
+    if (millis() - lastRadarRunCheck > RADAR_CHECK_DELAY)
+    {
+      radar.run();
+      lastRadarRunCheck = millis();
+    }
+  }
 
   boolean isDark()
   {
@@ -34,6 +48,17 @@ private:
     lastAmbientLightCheck = millis();
 
     return ambientLight < THRESHOLD_BRIGHTNESS;
+  }
+
+  bool isHumanPresent()
+  {
+    if (millis() - radarTimer > radarTimeout)
+    {
+      humanPresentFlag = radar.isHumanPresent();
+      radarTimer = millis();
+    }
+
+    return humanPresentFlag;
   }
 
   void switchStrip(bool switchOn)
@@ -89,7 +114,7 @@ public:
     }
 
     // Initialize the radar sensor
-    radar.setup(18, 19); // RX, TX
+    radar.begin(18, 19); // RX, TX
   }
 
   void loop()
@@ -98,11 +123,11 @@ public:
       return; // Skip loop if disabled
 
     // Refresh the radar sensor
-    radar.run();
+    refreshRadar();
 
     if (isDark())
     {
-      if (radar.isHumanPresent())
+      if (isHumanPresent())
       {
 
         switchStrip(true); // Turn on the strip
