@@ -125,26 +125,24 @@ public:
   void loop()
   {
     if (!enabled)
-      return; // Skip loop if disabled
-
-    // Refresh the radar sensor
-    refreshRadar();
+      return;
 
     if (isDark())
     {
+      refreshRadar();
       if (isHumanPresent())
       {
 
-        switchStrip(true); // Turn on the strip
+        switchStrip(true);
       }
       else
       {
-        switchStrip(false); // Turn off the strip
+        switchStrip(false);
       }
     }
     else
     {
-      switchStrip(false); // Turn off the strip
+      switchStrip(false);
     }
   }
 
