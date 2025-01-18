@@ -153,6 +153,7 @@ public:
     root["ambientLight"] = ambientLight;
     root["radarStatus"] = radar.getStatus();
     root["radarDistance"] = radar.getDistance();
+    root["radarLastSucessfulRead"] = radar.getLastSucessfulRead();
   }
 
   void readFromJsonState(JsonObject &root) override
