@@ -20,6 +20,7 @@ private:
   const unsigned long RADAR_CHECK_DELAY = 100;
   float ambientLight = 0;
   bool enabled = true;
+  bool lastStripState;
   unsigned long lastRadarRunCheck = 0;
   unsigned long lastAmbientLightCheck = 0;
 
@@ -87,6 +88,7 @@ private:
 
   bool isHumanPresent()
   {
+    refreshRadar();
     bool presence = radar.isHumanPresent();
     unsigned long currentTime = millis();
 
@@ -107,6 +109,14 @@ private:
 
   void switchStrip(bool switchOn)
   {
+
+    if (switchOn == lastStripState)
+    {
+      return;
+    }
+
+    lastStripState = switchOn;
+
     if (bri && switchOn)
       return; // If already on and trying to switch on, do nothing
     if (!bri && !switchOn)
