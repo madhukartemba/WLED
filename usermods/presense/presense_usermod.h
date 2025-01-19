@@ -298,27 +298,26 @@ public:
   void addToConfig(JsonObject &root) override
   {
     JsonObject presenseUsermod = root.createNestedObject(FPSTR(_name));
-    presenseUsermod["enabled"] = enabled;
-    presenseUsermod["radarTimeout"] = radarTimeout;
-    presenseUsermod["mode"] = modeToString(mode);
-    presenseUsermod["ambientLightThresholdBrightness"] = ambientLightThresholdBrightness;
+    presenseUsermod[FPSTR(_enabled)] = enabled;
+    presenseUsermod[FPSTR(_radarTimeout)] = radarTimeout;
+    presenseUsermod[FPSTR(_mode)] = modeToString(mode);
+    presenseUsermod[FPSTR(_ambientLightThreshold)] = ambientLightThresholdBrightness;
   }
 
   bool readFromConfig(JsonObject &root) override
   {
     JsonObject top = root[FPSTR(_name)];
     bool configComplete = !top.isNull();
-
-    configComplete &= getJsonValue(top["enabled"], enabled);
-    configComplete &= getJsonValue(top["radarTimeout"], radarTimeout);
-    configComplete &= getJsonValue(top["mode"], mode);
-    configComplete &= getJsonValue(top["ambientLightThresholdBrightness"], ambientLightThresholdBrightness);
+    configComplete &= getJsonValue(top[FPSTR(_enabled)], enabled);
+    configComplete &= getJsonValue(top[FPSTR(_radarTimeout)], radarTimeout);
+    configComplete &= getJsonValue(top[FPSTR(_mode)], mode);
+    configComplete &= getJsonValue(top[FPSTR(_ambientLightThreshold)], ambientLightThresholdBrightness);
 
     return configComplete;
   }
 };
 
-const char PresenseUsermod::_name[] PROGMEM = "presenseUsermod";
+const char PresenseUsermod::_name[] PROGMEM = "PresenseUsermod";
 const char PresenseUsermod::_enabled[] PROGMEM = "enabled";
 const char PresenseUsermod::_radarTimeout[] PROGMEM = "radarTimeout";
 const char PresenseUsermod::_mode[] PROGMEM = "mode";
