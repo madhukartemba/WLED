@@ -94,12 +94,8 @@ public:
 
     void loop()
     {
-        if (millis() - readTimer > READ_DELAY)
-        {
-            onOffButton.run();
-            reduceBrightnessButton.run();
-            increaseBrightnessButton.run();
-            readTimer = millis();
-        }
+        onOffButton.run();
+        reduceBrightnessButton.run();
+        increaseBrightnessButton.run();
     }
 };
