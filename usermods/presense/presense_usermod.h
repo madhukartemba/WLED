@@ -9,13 +9,12 @@ class PresenseUsermod : public Usermod
 private:
   APDS9930 apds = APDS9930();
   RD_03E radar = RD_03E(Serial1);
-  float thresholdBrightness = 15;
+
+  float ambientLightThresholdBrightness = 15;
 
   // 0 -> both radar and light sensor, 1 -> only radar, 2 -> only light sensor
   int mode = 0;
 
-  const float BRIGHTNESS_CONSTANT = 0.5;
-  const unsigned long LOOP_DELAY = 1000;
   const unsigned long AMBIENT_LIGHT_CHECK_DELAY = 1000;
   const unsigned long RADAR_CHECK_DELAY = 100;
   float ambientLight = 0;
@@ -27,6 +26,10 @@ private:
   unsigned long radarTimer = 0;
   bool humanPresentFlag = false;
   unsigned long radarTimeout = 10000;
+
+  // Strings to reduce memory usage (used more than twice)
+  static const char _name[];
+  static const char _enabled[];
 
   String modeToString(int mode)
   {
@@ -72,7 +75,7 @@ private:
   {
     if (millis() - lastAmbientLightCheck < AMBIENT_LIGHT_CHECK_DELAY)
     {
-      return ambientLight < thresholdBrightness;
+      return ambientLight < ambientLightThresholdBrightness;
     }
 
     if (!apds.readAmbientLightLux(ambientLight))
@@ -83,7 +86,7 @@ private:
 
     lastAmbientLightCheck = millis();
 
-    return ambientLight < thresholdBrightness;
+    return ambientLight < ambientLightThresholdBrightness;
   }
 
   bool isHumanPresent()
@@ -271,7 +274,46 @@ public:
   // Add usermod settings to the info page in the web UI
   void addToJsonInfo(JsonObject &root) override
   {
-    JsonObject usermod = root.createNestedObject("PresenseUsermod");
-    usermod["enabled"] = enabled;
+    JsonObject user = root["u"];
+    if (user.isNull())
+      user = root.createNestedObject("u");
+
+    JsonArray infoArr = user.createNestedArray(FPSTR(_name));
+
+    String uiDomString = F("<button class=\"btn btn-xs\" onclick=\"requestJson({");
+    uiDomString += FPSTR(_name);
+    uiDomString += F(":{");
+    uiDomString += FPSTR(_enabled);
+    uiDomString += enabled ? F(":false}});\">") : F(":true}});\">");
+    uiDomString += F("<i class=\"icons");
+    uiDomString += enabled ? F(" on") : F(" off");
+    uiDomString += F("\">&#xe08f;</i>");
+    uiDomString += F("</button>");
+    infoArr.add(uiDomString);
+  }
+
+  void addToConfig(JsonObject &root) override
+  {
+    JsonObject presenseUsermod = root.createNestedObject(FPSTR(_name));
+    presenseUsermod["enabled"] = enabled;
+    presenseUsermod["radarTimeout"] = radarTimeout;
+    presenseUsermod["mode"] = modeToString(mode);
+    presenseUsermod["ambientLightThresholdBrightness"] = ambientLightThresholdBrightness;
+  }
+
+  bool readFromConfig(JsonObject &root) override
+  {
+    JsonObject top = root[FPSTR(_name)];
+    bool configComplete = !top.isNull();
+
+    configComplete &= getJsonValue(top["enabled"], enabled);
+    configComplete &= getJsonValue(top["radarTimeout"], radarTimeout);
+    configComplete &= getJsonValue(top["mode"], mode);
+    configComplete &= getJsonValue(top["ambientLightThresholdBrightness"], ambientLightThresholdBrightness);
+
+    return configComplete;
   }
 };
+
+const char PresenseUsermod::_name[] PROGMEM = "presenseUsermod";
+const char PresenseUsermod::_enabled[] PROGMEM = "enabled";
