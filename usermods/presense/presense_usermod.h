@@ -110,7 +110,7 @@ private:
   void switchStrip(bool switchOn)
   {
 
-    if (switchOn == lastStripState)
+    if (lastStripState == NULL || switchOn == lastStripState)
     {
       return;
     }
