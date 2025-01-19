@@ -9,7 +9,11 @@ class PresenseUsermod : public Usermod
 private:
   APDS9930 apds = APDS9930();
   RD_03E radar = RD_03E(Serial1);
-  const float THRESHOLD_BRIGHTNESS = 15;
+  float thresholdBrightness = 15;
+
+  // 0 -> both radar and light sensor, 1 -> only radar, 2 -> only light sensor
+  int mode = 0;
+
   const float BRIGHTNESS_CONSTANT = 0.5;
   const unsigned long LOOP_DELAY = 1000;
   const unsigned long AMBIENT_LIGHT_CHECK_DELAY = 1000;
@@ -23,6 +27,41 @@ private:
   bool humanPresentFlag = false;
   unsigned long radarTimeout = 10000;
 
+  String modeToString(int mode)
+  {
+    switch (mode)
+    {
+    case 0:
+      return "RADAR_AND_LIGHT_SENSOR";
+    case 1:
+      return "ONLY_RADAR";
+    case 2:
+      return "ONLY_LIGHT_SENSOR";
+    default:
+      return "RADAR_AND_LIGHT_SENSOR";
+    }
+  }
+
+  int stringToMode(String mode)
+  {
+    if (mode == "RADAR_AND_LIGHT_SENSOR")
+    {
+      return 0;
+    }
+    else if (mode == "ONLY_RADAR")
+    {
+      return 1;
+    }
+    else if (mode == "ONLY_LIGHT_SENSOR")
+    {
+      return 2;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
   void refreshRadar()
   {
     radar.run();
@@ -32,7 +71,7 @@ private:
   {
     if (millis() - lastAmbientLightCheck < AMBIENT_LIGHT_CHECK_DELAY)
     {
-      return ambientLight < THRESHOLD_BRIGHTNESS;
+      return ambientLight < thresholdBrightness;
     }
 
     if (!apds.readAmbientLightLux(ambientLight))
@@ -43,7 +82,7 @@ private:
 
     lastAmbientLightCheck = millis();
 
-    return ambientLight < THRESHOLD_BRIGHTNESS;
+    return ambientLight < thresholdBrightness;
   }
 
   bool isHumanPresent()
@@ -149,18 +188,35 @@ public:
   // Add this to expose settings in the web UI
   void addToJsonState(JsonObject &root) override
   {
-    root["presenseUsermodEnabled"] = enabled; // Add the enabled state to the JSON
-    root["ambientLight"] = ambientLight;
-    root["radarStatus"] = radar.getStatus();
-    root["radarDistance"] = radar.getDistance();
-    root["radarLastSucessfulRead"] = radar.getLastSucessfulRead();
+    JsonObject presenseUsermod = root.createNestedObject("presenseUsermod");
+    presenseUsermod["enabled"] = enabled;
+    presenseUsermod["radarTimeout"] = radarTimeout;
+    presenseUsermod["mode"] = modeToString(mode);
+
+    JsonObject status = presenseUsermod.createNestedObject("status");
+    status["ambientLight"] = ambientLight;
+    status["radarStatus"] = radar.getStatus();
+    status["radarDistance"] = radar.getDistance();
+    status["radarLastSucessfulRead"] = radar.getLastSucessfulRead();
   }
 
   void readFromJsonState(JsonObject &root) override
   {
-    if (root.containsKey("presenseUsermodEnabled"))
+    if (root.containsKey("presenseUsermod"))
     {
-      enabled = root["presenseUsermodEnabled"]; // Read the enabled state from JSON
+      JsonObject presenseUsermod = root["presenseUsermod"];
+      if (presenseUsermod.containsKey("enabled"))
+      {
+        enabled = presenseUsermod["enabled"];
+      }
+      if (presenseUsermod.containsKey("radarTimeout"))
+      {
+        radarTimeout = presenseUsermod["radarTimeout"];
+      }
+      if (presenseUsermod.containsKey("mode"))
+      {
+        mode = stringToMode(presenseUsermod["mode"].as<String>());
+      }
     }
   }
 
