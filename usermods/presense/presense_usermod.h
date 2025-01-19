@@ -80,13 +80,13 @@ private:
     switch (status)
     {
     case 0:
-      return FPSTR(_radarStatuses[0]);
+      return String(FPSTR(_radarStatuses[0]));
     case 1:
-      return FPSTR(_radarStatuses[1]);
+      return String(FPSTR(_radarStatuses[1]));
     case 2:
-      return FPSTR(_radarStatuses[2]);
+      return String(FPSTR(_radarStatuses[2]));
     default:
-      return FPSTR(_radarStatuses[0]);
+      return String(FPSTR(_radarStatuses[0]));
     }
   }
 
@@ -323,13 +323,19 @@ public:
       uiDomString += F(":{");
       uiDomString += FPSTR(_mode);
       uiDomString += F(":this.value}});\">");
-      uiDomString += F("<option value=\"RADAR_AND_LIGHT_SENSOR\"");
+      uiDomString += F("<option value=\"");
+      uiDomString += FPSTR(_modes[0]);
+      uiDomString += F("\"");
       uiDomString += mode == 0 ? F(" selected") : F("");
       uiDomString += F(">Radar and Light Sensor</option>");
-      uiDomString += F("<option value=\"ONLY_RADAR\"");
+      uiDomString += F("<option value=\"");
+      uiDomString += FPSTR(_modes[1]);
+      uiDomString += F("\"");
       uiDomString += mode == 1 ? F(" selected") : F("");
       uiDomString += F(">Only Radar</option>");
-      uiDomString += F("<option value=\"ONLY_LIGHT_SENSOR\"");
+      uiDomString += F("<option value=\"");
+      uiDomString += FPSTR(_modes[2]);
+      uiDomString += F("\"");
       uiDomString += mode == 2 ? F(" selected") : F("");
       uiDomString += F(">Only Light Sensor</option>");
       uiDomString += F("</select>");
