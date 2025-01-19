@@ -129,6 +129,49 @@ private:
     strip.show();
   }
 
+  void mode1()
+  {
+    if (isDark())
+    {
+      if (isHumanPresent())
+      {
+        switchStrip(true);
+      }
+      else
+      {
+        switchStrip(false);
+      }
+    }
+    else
+    {
+      switchStrip(false);
+    }
+  }
+
+  void mode2()
+  {
+    if (isHumanPresent())
+    {
+      switchStrip(true);
+    }
+    else
+    {
+      switchStrip(false);
+    }
+  }
+
+  void mode3()
+  {
+    if (isDark())
+    {
+      switchStrip(true);
+    }
+    else
+    {
+      switchStrip(false);
+    }
+  }
+
 public:
   void setup()
   {
@@ -166,22 +209,20 @@ public:
     if (!enabled)
       return;
 
-    if (isDark())
+    switch (mode)
     {
-      refreshRadar();
-      if (isHumanPresent())
-      {
-
-        switchStrip(true);
-      }
-      else
-      {
-        switchStrip(false);
-      }
-    }
-    else
-    {
-      switchStrip(false);
+    case 0:
+      mode1();
+      break;
+    case 1:
+      mode2();
+      break;
+    case 2:
+      mode3();
+      break;
+    default:
+      mode1();
+      break;
     }
   }
 
