@@ -60,7 +60,7 @@ public:
     {
         if (bri > 0)
         {
-            bri = max(bri - 10, 0);
+            bri = max(bri - 25, 0);
             stateUpdated(CALL_MODE_BUTTON);
             strip.show();
         }
@@ -70,7 +70,7 @@ public:
     {
         if (bri < 255)
         {
-            bri = min(bri + 10, 255);
+            bri = min(bri + 25, 255);
             stateUpdated(CALL_MODE_BUTTON);
             strip.show();
         }
