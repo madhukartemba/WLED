@@ -40,6 +40,9 @@ private:
     Button reduceBrightnessButton = Button(26);
     Button increaseBrightnessButton = Button(25);
 
+    static constexpr unsigned long READ_DELAY = 100;
+    unsigned long readTimer = 0;
+
 public:
     void toggleStrip()
     {
@@ -91,8 +94,12 @@ public:
 
     void loop()
     {
-        onOffButton.run();
-        reduceBrightnessButton.run();
-        increaseBrightnessButton.run();
+        if (millis() - readTimer > READ_DELAY)
+        {
+            onOffButton.run();
+            reduceBrightnessButton.run();
+            increaseBrightnessButton.run();
+            readTimer = millis();
+        }
     }
 };
