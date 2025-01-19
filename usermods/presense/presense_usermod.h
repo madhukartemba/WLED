@@ -30,6 +30,9 @@ private:
   // Strings to reduce memory usage (used more than twice)
   static const char _name[];
   static const char _enabled[];
+  static const char _radarTimeout[];
+  static const char _mode[];
+  static const char _ambientLightThreshold[];
 
   String modeToString(int mode)
   {
@@ -239,34 +242,34 @@ public:
   // Add this to expose settings in the web UI
   void addToJsonState(JsonObject &root) override
   {
-    JsonObject presenseUsermod = root.createNestedObject("presenseUsermod");
-    presenseUsermod["enabled"] = enabled;
-    presenseUsermod["radarTimeout"] = radarTimeout;
-    presenseUsermod["mode"] = modeToString(mode);
+    JsonObject presenseUsermod = root.createNestedObject(FPSTR(_name));
+    presenseUsermod[FPSTR(_enabled)] = enabled;
+    presenseUsermod[FPSTR(_radarTimeout)] = radarTimeout;
+    presenseUsermod[FPSTR(_mode)] = modeToString(mode);
 
-    JsonObject status = presenseUsermod.createNestedObject("status");
-    status["ambientLight"] = ambientLight;
-    status["radarStatus"] = radar.getStatus();
-    status["radarDistance"] = radar.getDistance();
-    status["radarLastSucessfulRead"] = radar.getLastSucessfulRead();
+    JsonObject status = presenseUsermod.createNestedObject(F("status"));
+    status[F("ambientLight")] = ambientLight;
+    status[F("radarStatus")] = radar.getStatus();
+    status[F("radarDistance")] = radar.getDistance();
+    status[F("radarLastSucessfulRead")] = radar.getLastSucessfulRead();
   }
 
   void readFromJsonState(JsonObject &root) override
   {
-    if (root.containsKey("presenseUsermod"))
+    if (root.containsKey(FPSTR(_name)))
     {
-      JsonObject presenseUsermod = root["presenseUsermod"];
-      if (presenseUsermod.containsKey("enabled"))
+      JsonObject presenseUsermod = root[FPSTR(_name)];
+      if (presenseUsermod.containsKey(FPSTR(_enabled)))
       {
-        enabled = presenseUsermod["enabled"];
+        enabled = presenseUsermod[FPSTR(_enabled)];
       }
-      if (presenseUsermod.containsKey("radarTimeout"))
+      if (presenseUsermod.containsKey(FPSTR(_radarTimeout)))
       {
-        radarTimeout = presenseUsermod["radarTimeout"];
+        radarTimeout = presenseUsermod[FPSTR(_radarTimeout)];
       }
-      if (presenseUsermod.containsKey("mode"))
+      if (presenseUsermod.containsKey(FPSTR(_mode)))
       {
-        mode = stringToMode(presenseUsermod["mode"].as<String>());
+        mode = stringToMode(presenseUsermod[FPSTR(_mode)].as<String>());
       }
     }
   }
@@ -317,3 +320,6 @@ public:
 
 const char PresenseUsermod::_name[] PROGMEM = "presenseUsermod";
 const char PresenseUsermod::_enabled[] PROGMEM = "enabled";
+const char PresenseUsermod::_radarTimeout[] PROGMEM = "radarTimeout";
+const char PresenseUsermod::_mode[] PROGMEM = "mode";
+const char PresenseUsermod::_ambientLightThreshold[] PROGMEM = "ambientLightThreshold";
