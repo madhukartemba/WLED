@@ -270,7 +270,7 @@ public:
 
     JsonObject status = presenseUsermod.createNestedObject(F("status"));
     status[FPSTR(_ambientLight)] = ambientLight;
-    status[FPSTR(_radarStatus)] = radar.getStatus();
+    status[FPSTR(_radarStatus)] = radarStatusToString(radar.getStatus());
     status[FPSTR(_radarDistance)] = radar.getDistance();
     status[FPSTR(_radarLastSucessfulRead)] = radar.getLastSucessfulRead();
   }
@@ -295,16 +295,19 @@ public:
     }
   }
 
-  // Add usermod settings to the info page in the web UI
   void addToJsonInfo(JsonObject &root) override
   {
     JsonObject user = root["u"];
     if (user.isNull())
+    {
       user = root.createNestedObject("u");
+    }
 
     JsonArray infoArr = user.createNestedArray(FPSTR(_name));
 
-    String uiDomString = F("<button class=\"btn btn-xs\" onclick=\"requestJson({");
+    // Add toggle button with spacing
+    String uiDomString = F("<div style=\"margin-bottom: 10px;\">");
+    uiDomString += F("<button class=\"btn btn-xs\" onclick=\"requestJson({");
     uiDomString += FPSTR(_name);
     uiDomString += F(":{");
     uiDomString += FPSTR(_enabled);
@@ -313,42 +316,50 @@ public:
     uiDomString += enabled ? F(" on") : F(" off");
     uiDomString += F("\">&#xe08f;</i>");
     uiDomString += F("</button>");
+    uiDomString += F("</div>");
     infoArr.add(uiDomString);
 
     if (enabled)
     {
-      // Select the mode
-      uiDomString = F("<select class=\"form-control\" onchange=\"requestJson({");
+      // Add mode selection dropdown with spacing
+      uiDomString = F("<div style=\"margin-bottom: 10px;\">");
+      uiDomString += F("<select class=\"form-control\" style=\"display: inline-block; width: auto;\" onchange=\"requestJson({");
       uiDomString += FPSTR(_name);
       uiDomString += F(":{");
       uiDomString += FPSTR(_mode);
       uiDomString += F(":this.value}});\">");
+
+      // Radar and Light Sensor mode
       uiDomString += F("<option value=\"");
       uiDomString += FPSTR(_modes[0]);
       uiDomString += F("\"");
-      uiDomString += mode == 0 ? F(" selected") : F("");
+      uiDomString += (mode == 0) ? F(" selected") : F("");
       uiDomString += F(">Radar and Light Sensor</option>");
+
+      // Only Radar mode
       uiDomString += F("<option value=\"");
       uiDomString += FPSTR(_modes[1]);
       uiDomString += F("\"");
-      uiDomString += mode == 1 ? F(" selected") : F("");
-      uiDomString += F(">Only Radar</option>");
+      uiDomString += (mode == 1) ? F(" selected") : F("");
+      uiDomString += F(">Radar Only</option>");
+
+      // Only Light Sensor mode
       uiDomString += F("<option value=\"");
       uiDomString += FPSTR(_modes[2]);
       uiDomString += F("\"");
-      uiDomString += mode == 2 ? F(" selected") : F("");
-      uiDomString += F(">Only Light Sensor</option>");
-      uiDomString += F("</select>");
-      infoArr.add(uiDomString);
+      uiDomString += (mode == 2) ? F(" selected") : F("");
+      uiDomString += F(">Light Sensor Only</option>");
+      uiDomString += F("</select></div>");
 
-      // Add the presense info
-      uiDomString = F("<div class=\"row\"><div class=\"col-6\">");
-      uiDomString += F("Ambient Light: ");
-      uiDomString += ambientLight;
-      uiDomString += F("</div><div class=\"col-6\">");
-      uiDomString += F("Radar Status: ");
+      // Add status information
+      uiDomString += F("<div style=\"margin-bottom: 5px;\">");
+      uiDomString += F("<strong>Ambient Light:</strong> ");
+      uiDomString += String(ambientLight);
+      uiDomString += F("</div>");
+      uiDomString += F("<div style=\"margin-bottom: 5px;\">");
+      uiDomString += F("<strong>Radar Status:</strong> ");
       uiDomString += radarStatusToString(radar.getStatus());
-      uiDomString += F("</div></div>");
+      uiDomString += F("</div>");
       infoArr.add(uiDomString);
     }
   }
