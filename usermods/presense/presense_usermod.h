@@ -33,39 +33,60 @@ private:
   static const char _radarTimeout[];
   static const char _mode[];
   static const char _ambientLightThreshold[];
+  static const char _ambientLight[];
+  static const char _radarStatus[];
+  static const char _radarDistance[];
+  static const char _radarLastSucessfulRead[];
+  static const char *const _modes[];
+  static const char *const _radarStatuses[];
 
   String modeToString(int mode)
   {
     switch (mode)
     {
     case 0:
-      return "RADAR_AND_LIGHT_SENSOR";
+      return FPSTR(_modes[0]);
     case 1:
-      return "ONLY_RADAR";
+      return FPSTR(_modes[1]);
     case 2:
-      return "ONLY_LIGHT_SENSOR";
+      return FPSTR(_modes[2]);
     default:
-      return "RADAR_AND_LIGHT_SENSOR";
+      return FPSTR(_modes[0]);
     }
   }
 
   int stringToMode(String mode)
   {
-    if (mode == "RADAR_AND_LIGHT_SENSOR")
+    if (mode == FPSTR(_modes[0]))
     {
       return 0;
     }
-    else if (mode == "ONLY_RADAR")
+    else if (mode == FPSTR(_modes[1]))
     {
       return 1;
     }
-    else if (mode == "ONLY_LIGHT_SENSOR")
+    else if (mode == FPSTR(_modes[2]))
     {
       return 2;
     }
     else
     {
       return 0;
+    }
+  }
+
+  String radarStatusToString(int status)
+  {
+    switch (status)
+    {
+    case 0:
+      return FPSTR(_radarStatuses[0]);
+    case 1:
+      return FPSTR(_radarStatuses[1]);
+    case 2:
+      return FPSTR(_radarStatuses[2]);
+    default:
+      return FPSTR(_radarStatuses[0]);
     }
   }
 
@@ -248,10 +269,10 @@ public:
     presenseUsermod[FPSTR(_mode)] = modeToString(mode);
 
     JsonObject status = presenseUsermod.createNestedObject(F("status"));
-    status[F("ambientLight")] = ambientLight;
-    status[F("radarStatus")] = radar.getStatus();
-    status[F("radarDistance")] = radar.getDistance();
-    status[F("radarLastSucessfulRead")] = radar.getLastSucessfulRead();
+    status[FPSTR(_ambientLight)] = ambientLight;
+    status[FPSTR(_radarStatus)] = radar.getStatus();
+    status[FPSTR(_radarDistance)] = radar.getDistance();
+    status[FPSTR(_radarLastSucessfulRead)] = radar.getLastSucessfulRead();
   }
 
   void readFromJsonState(JsonObject &root) override
@@ -293,6 +314,37 @@ public:
     uiDomString += F("\">&#xe08f;</i>");
     uiDomString += F("</button>");
     infoArr.add(uiDomString);
+
+    if (enabled)
+    {
+      // Select the mode
+      uiDomString = F("<select class=\"form-control\" onchange=\"requestJson({");
+      uiDomString += FPSTR(_name);
+      uiDomString += F(":{");
+      uiDomString += FPSTR(_mode);
+      uiDomString += F(":this.value}});\">");
+      uiDomString += F("<option value=\"RADAR_AND_LIGHT_SENSOR\"");
+      uiDomString += mode == 0 ? F(" selected") : F("");
+      uiDomString += F(">Radar and Light Sensor</option>");
+      uiDomString += F("<option value=\"ONLY_RADAR\"");
+      uiDomString += mode == 1 ? F(" selected") : F("");
+      uiDomString += F(">Only Radar</option>");
+      uiDomString += F("<option value=\"ONLY_LIGHT_SENSOR\"");
+      uiDomString += mode == 2 ? F(" selected") : F("");
+      uiDomString += F(">Only Light Sensor</option>");
+      uiDomString += F("</select>");
+      infoArr.add(uiDomString);
+
+      // Add the presense info
+      uiDomString = F("<div class=\"row\"><div class=\"col-6\">");
+      uiDomString += F("Ambient Light: ");
+      uiDomString += ambientLight;
+      uiDomString += F("</div><div class=\"col-6\">");
+      uiDomString += F("Radar Status: ");
+      uiDomString += radarStatusToString(radar.getStatus());
+      uiDomString += F("</div></div>");
+      infoArr.add(uiDomString);
+    }
   }
 
   void addToConfig(JsonObject &root) override
@@ -322,3 +374,9 @@ const char PresenseUsermod::_enabled[] PROGMEM = "enabled";
 const char PresenseUsermod::_radarTimeout[] PROGMEM = "radarTimeout";
 const char PresenseUsermod::_mode[] PROGMEM = "mode";
 const char PresenseUsermod::_ambientLightThreshold[] PROGMEM = "ambientLightThreshold";
+const char PresenseUsermod::_ambientLight[] PROGMEM = "ambientLight";
+const char PresenseUsermod::_radarStatus[] PROGMEM = "radarStatus";
+const char PresenseUsermod::_radarDistance[] PROGMEM = "radarDistance";
+const char PresenseUsermod::_radarLastSucessfulRead[] PROGMEM = "radarLastSucessfulRead";
+const char *const PresenseUsermod::_modes[] PROGMEM = {"RADAR_AND_LIGHT", "RADAR_ONLY", "LIGHT_ONLY"};
+const char *const PresenseUsermod::_radarStatuses[] PROGMEM = {"HUMAN_ABSENT", "HUMAN_MOVING", "HUMAN_PRESENT"};
