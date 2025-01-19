@@ -209,20 +209,17 @@ public:
     if (!enabled)
       return;
 
-    switch (mode)
+    if (mode == 0)
     {
-    case 0:
       mode1();
-      break;
-    case 1:
+    }
+    else if (mode == 1)
+    {
       mode2();
-      break;
-    case 2:
+    }
+    else if (mode == 2)
+    {
       mode3();
-      break;
-    default:
-      mode1();
-      break;
     }
   }
 
