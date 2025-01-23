@@ -12,7 +12,7 @@ private:
     unsigned long lastPressTime = 0;
     unsigned long lastDebounceTime = 0;
     static constexpr unsigned long LONG_PRESS_DELAY = 1000;
-    static constexpr unsigned long DEBOUNCE_DELAY = 150;
+    static constexpr unsigned long DEBOUNCE_DELAY = 75;
     std::function<void()> onClick;
     std::function<void()> onLongPress;
 
