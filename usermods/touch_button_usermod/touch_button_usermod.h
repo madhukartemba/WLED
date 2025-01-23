@@ -12,7 +12,7 @@ private:
     unsigned long lastPressTime = 0;
     unsigned long lastDebounceTime = 0;
     static constexpr unsigned long LONG_PRESS_DELAY = 1000;
-    static constexpr unsigned long DEBOUNCE_DELAY = 50;
+    static constexpr unsigned long DEBOUNCE_DELAY = 150;
     std::function<void()> onClick;
     std::function<void()> onLongPress;
 
@@ -110,9 +110,9 @@ public:
 
     void reduceBrightness()
     {
-        if (bri > 0)
+        if (bri > 1)
         {
-            bri = max(bri - 25, 0);
+            bri = max(bri - 25, 1);
             stateUpdated(CALL_MODE_BUTTON);
             strip.show();
         }
@@ -130,6 +130,9 @@ public:
 
     void setBrightness(uint8_t brightness)
     {
+        if (bri == brightness)
+            return;
+
         bri = brightness;
         stateUpdated(CALL_MODE_BUTTON);
         strip.show();
