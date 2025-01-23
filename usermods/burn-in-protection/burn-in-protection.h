@@ -1,5 +1,7 @@
 #include "wled.h"
 
+// Some leds of the strip can turn on randomly due to electrical noise.
+// This usermod will turn off the leds if they are not being used.
 class BurnInProtection : public Usermod
 {
 private:
@@ -33,7 +35,6 @@ public:
 
         if (millis() - resetLedTimer > resetLedDelay && shouldReset())
         {
-            colorUpdated(CALL_MODE_BUTTON);
             strip.show();
             resetLedTimer = millis();
         }
