@@ -13,6 +13,7 @@
 
 #include "../usermods/Presense/presense_usermod.h"
 #include "../usermods/touch_button_usermod/touch_button_usermod.h"
+#include "../usermods/burn-in-protection/burn-in-protection.h"
 
 #ifdef USERMOD_BATTERY
   #include "../usermods/Battery/usermod_v2_Battery.h"
@@ -261,7 +262,7 @@ void registerUsermods()
 
   UsermodManager::add(new PresenseUsermod());
   UsermodManager::add(new TouchButtonUsermod());
-
+  UsermodManager::add(new BurnInProtection());
 
   #ifdef USERMOD_BATTERY
   UsermodManager::add(new UsermodBattery());
