@@ -262,7 +262,6 @@ void registerUsermods()
   UsermodManager::add(new PresenseUsermod());
   UsermodManager::add(new TouchButtonUsermod());
 
-  // test 12341231242143421
 
   #ifdef USERMOD_BATTERY
   UsermodManager::add(new UsermodBattery());
