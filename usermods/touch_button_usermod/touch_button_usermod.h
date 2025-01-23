@@ -11,7 +11,6 @@ private:
     boolean longPressCalled = false;
     unsigned long lastPressTime = 0;
     unsigned long lastDebounceTime = 0;
-    static constexpr unsigned long CLICK_DELAY = 200;
     static constexpr unsigned long LONG_PRESS_DELAY = 1000;
     static constexpr unsigned long DEBOUNCE_DELAY = 50;
     std::function<void()> onClick;
@@ -19,22 +18,7 @@ private:
 
 public:
     Button(int pin)
-        : pin(pin)
-    {
-        // Verify that timers are valid
-        if (CLICK_DELAY < DEBOUNCE_DELAY)
-        {
-            Serial.println(F("Button Error: CLICK_DELAY must be greater than DEBOUNCE_DELAY"));
-        }
-        if (LONG_PRESS_DELAY < DEBOUNCE_DELAY)
-        {
-            Serial.println(F("Button Error: LONG_PRESS_DELAY must be greater than DEBOUNCE_DELAY"));
-        }
-        if (LONG_PRESS_DELAY < CLICK_DELAY)
-        {
-            Serial.println(F("Button Error: LONG_PRESS_DELAY must be greater than CLICK_DELAY"));
-        }
-    };
+        : pin(pin) {};
 
     void setup(std::function<void()> onClickCallback)
     {
@@ -73,7 +57,7 @@ public:
 
         if (lastState == HIGH && newState == LOW)
         {
-            if (currentTime - lastPressTime < CLICK_DELAY && currentTime - lastDebounceTime > DEBOUNCE_DELAY)
+            if (currentTime - lastPressTime < LONG_PRESS_DELAY && currentTime - lastDebounceTime > DEBOUNCE_DELAY)
             {
                 if (onClick)
                 {
@@ -136,7 +120,9 @@ public:
 
     void switchEffects()
     {
-
+        effectCurrent = (effectCurrent + 1) % strip.getModeCount();
+        colorUpdated(CALL_MODE_BUTTON);
+        strip.show();
     }
 
     void loadBootPreset()
@@ -165,14 +151,9 @@ public:
 
     void loop()
     {
-        if (millis() - readTimer < READ_DELAY)
-            return;
-
         onOffButton.run();
         reduceBrightnessButton.run();
         increaseBrightnessButton.run();
         resetToDefaultPresetButton.run();
-
-        readTimer = millis();
     }
 };
