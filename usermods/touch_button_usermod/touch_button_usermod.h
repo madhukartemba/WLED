@@ -79,8 +79,9 @@ private:
     Button increaseBrightnessButton = Button(25);
     Button resetToDefaultPresetButton = Button(33);
 
-    static constexpr unsigned long READ_DELAY = 100;
-    unsigned long readTimer = 0;
+    int currentFavoriteEffectIndex = 0;
+    // Add favorite effects here
+    std::vector<uint8_t> favoriteEffects = {FX_MODE_COLORTWINKLE, FX_MODE_PIXELWAVE, FX_MODE_PLASMOID, FX_MODE_RAINBOW_CYCLE, FX_MODE_GRAVCENTRIC, FX_MODE_METEOR, FX_MODE_STARBURST, FX_MODE_RIPPLEPEAK};
 
 public:
     void toggleStrip()
@@ -120,7 +121,8 @@ public:
 
     void switchEffects()
     {
-        effectCurrent = (effectCurrent + 1) % strip.getModeCount();
+        effectCurrent = favoriteEffects[currentFavoriteEffectIndex];
+        currentFavoriteEffectIndex = (currentFavoriteEffectIndex + 1) % favoriteEffects.size();
         colorUpdated(CALL_MODE_BUTTON);
         strip.show();
     }
