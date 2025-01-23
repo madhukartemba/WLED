@@ -74,6 +74,10 @@ public:
 class TouchButtonUsermod : public Usermod
 {
 private:
+    bool enabled = true;
+    static const char _name[];
+    static const char _enabled[];
+
     Button onOffButton = Button(27);
     Button reduceBrightnessButton = Button(26);
     Button increaseBrightnessButton = Button(25);
@@ -99,6 +103,11 @@ public:
         strip.show();
     }
 
+    void reboot()
+    {
+        doReboot = true;
+    }
+
     void reduceBrightness()
     {
         if (bri > 0)
@@ -119,6 +128,13 @@ public:
         }
     }
 
+    void setBrightness(uint8_t brightness)
+    {
+        bri = brightness;
+        stateUpdated(CALL_MODE_BUTTON);
+        strip.show();
+    }
+
     void switchEffects()
     {
         effectCurrent = favoriteEffects[currentFavoriteEffectIndex];
@@ -136,14 +152,24 @@ public:
 public:
     void setup()
     {
+
+        if (!enabled)
+            return;
+
         onOffButton.setup([this]()
-                          { toggleStrip(); });
+                          { toggleStrip(); },
+                          [this]()
+                          { reboot(); });
 
         reduceBrightnessButton.setup([this]()
-                                     { reduceBrightness(); });
+                                     { reduceBrightness(); },
+                                     [this]()
+                                     { setBrightness(1); });
 
         increaseBrightnessButton.setup([this]()
-                                       { increaseBrightness(); });
+                                       { increaseBrightness(); },
+                                       [this]()
+                                       { setBrightness(255); });
 
         resetToDefaultPresetButton.setup([this]()
                                          { switchEffects(); },
@@ -153,9 +179,45 @@ public:
 
     void loop()
     {
+        if (!enabled)
+            return;
+
         onOffButton.run();
         reduceBrightnessButton.run();
         increaseBrightnessButton.run();
         resetToDefaultPresetButton.run();
     }
+
+    void addToJsonState(JsonObject &root) override
+    {
+        JsonObject touchButtonUsermod = root.createNestedObject(_name);
+        touchButtonUsermod[_enabled] = enabled;
+    }
+
+    void readFromJsonState(JsonObject &root) override
+    {
+        JsonObject touchButtonUsermod = root[_name];
+        if (touchButtonUsermod.isNull())
+            return;
+
+        getJsonValue(touchButtonUsermod[_enabled], enabled);
+    }
+
+    void addToConfig(JsonObject &root) override
+    {
+        JsonObject touchButtonUsermod = root.createNestedObject(_name);
+        touchButtonUsermod[_enabled] = enabled;
+    }
+
+    bool readFromConfig(JsonObject &root) override
+    {
+        JsonObject top = root[_name];
+        bool configComplete = !top.isNull();
+        configComplete &= getJsonValue(top[_enabled], enabled);
+
+        return configComplete;
+    }
 };
+
+const char TouchButtonUsermod::_name[] = "TouchButtons";
+const char TouchButtonUsermod::_enabled[] = "enabled";

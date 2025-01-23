@@ -386,7 +386,7 @@ public:
   }
 };
 
-const char PresenseUsermod::_name[] PROGMEM = "PresenseUsermod";
+const char PresenseUsermod::_name[] PROGMEM = "Presense";
 const char PresenseUsermod::_enabled[] PROGMEM = "enabled";
 const char PresenseUsermod::_radarTimeout[] PROGMEM = "radarTimeout";
 const char PresenseUsermod::_mode[] PROGMEM = "mode";
