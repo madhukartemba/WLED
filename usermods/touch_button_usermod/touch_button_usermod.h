@@ -8,13 +8,33 @@ class Button
 private:
     int pin;
     int lastState = LOW;
-    unsigned long lastDebounceTimer = 0;
-    static constexpr unsigned long DEBOUNCE_DELAY = 100;
+    boolean longPressCalled = false;
+    unsigned long lastPressTime = 0;
+    unsigned long lastDebounceTime = 0;
+    static constexpr unsigned long CLICK_DELAY = 200;
+    static constexpr unsigned long LONG_PRESS_DELAY = 1000;
+    static constexpr unsigned long DEBOUNCE_DELAY = 50;
     std::function<void()> onClick;
+    std::function<void()> onLongPress;
 
 public:
     Button(int pin)
-        : pin(pin) {};
+        : pin(pin)
+    {
+        // Verify that timers are valid
+        if (CLICK_DELAY < DEBOUNCE_DELAY)
+        {
+            Serial.println(F("Button Error: CLICK_DELAY must be greater than DEBOUNCE_DELAY"));
+        }
+        if (LONG_PRESS_DELAY < DEBOUNCE_DELAY)
+        {
+            Serial.println(F("Button Error: LONG_PRESS_DELAY must be greater than DEBOUNCE_DELAY"));
+        }
+        if (LONG_PRESS_DELAY < CLICK_DELAY)
+        {
+            Serial.println(F("Button Error: LONG_PRESS_DELAY must be greater than CLICK_DELAY"));
+        }
+    };
 
     void setup(std::function<void()> onClickCallback)
     {
@@ -22,19 +42,45 @@ public:
         pinMode(pin, INPUT);
     }
 
+    void setup(std::function<void()> onClickCallback, std::function<void()> onLongPressCallback)
+    {
+        onLongPress = onLongPressCallback;
+        setup(onClickCallback);
+    }
+
     void run()
     {
         int newState = digitalRead(pin);
         unsigned long currentTime = millis();
 
+        if (lastState == LOW && newState == HIGH)
+        {
+            lastPressTime = currentTime;
+            lastDebounceTime = currentTime;
+        }
+
+        if (newState == HIGH)
+        {
+            if (currentTime - lastPressTime > LONG_PRESS_DELAY && !longPressCalled)
+            {
+                longPressCalled = true;
+                if (onLongPress)
+                {
+                    onLongPress();
+                }
+            }
+        }
+
         if (lastState == HIGH && newState == LOW)
         {
-            if (currentTime - lastDebounceTimer >= DEBOUNCE_DELAY)
+            if (currentTime - lastPressTime < CLICK_DELAY && currentTime - lastDebounceTime > DEBOUNCE_DELAY)
             {
-                lastDebounceTimer = currentTime;
                 if (onClick)
+                {
                     onClick();
+                }
             }
+            longPressCalled = false;
         }
 
         lastState = newState;
@@ -47,6 +93,7 @@ private:
     Button onOffButton = Button(27);
     Button reduceBrightnessButton = Button(26);
     Button increaseBrightnessButton = Button(25);
+    Button resetToDefaultPresetButton = Button(33);
 
     static constexpr unsigned long READ_DELAY = 100;
     unsigned long readTimer = 0;
@@ -87,6 +134,17 @@ public:
         }
     }
 
+    void switchEffects()
+    {
+
+    }
+
+    void loadBootPreset()
+    {
+        applyPreset(1);
+        stateUpdated(CALL_MODE_BUTTON);
+    }
+
 public:
     void setup()
     {
@@ -98,6 +156,11 @@ public:
 
         increaseBrightnessButton.setup([this]()
                                        { increaseBrightness(); });
+
+        resetToDefaultPresetButton.setup([this]()
+                                         { switchEffects(); },
+                                         [this]()
+                                         { loadBootPreset(); });
     }
 
     void loop()
@@ -108,6 +171,7 @@ public:
         onOffButton.run();
         reduceBrightnessButton.run();
         increaseBrightnessButton.run();
+        resetToDefaultPresetButton.run();
 
         readTimer = millis();
     }
