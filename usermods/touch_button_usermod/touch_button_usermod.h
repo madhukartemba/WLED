@@ -1,7 +1,6 @@
 #pragma once
 
 #include "wled.h"
-
 #include <functional>
 
 class Button
@@ -9,6 +8,8 @@ class Button
 private:
     int pin;
     int lastState = LOW;
+    unsigned long lastDebounceTimer = 0;
+    static constexpr unsigned long DEBOUNCE_DELAY = 100;
     std::function<void()> onClick;
 
 public:
@@ -24,11 +25,18 @@ public:
     void run()
     {
         int newState = digitalRead(pin);
+        unsigned long currentTime = millis();
+
         if (lastState == HIGH && newState == LOW)
         {
-            if (onClick)
-                onClick();
+            if (currentTime - lastDebounceTimer >= DEBOUNCE_DELAY)
+            {
+                lastDebounceTimer = currentTime;
+                if (onClick)
+                    onClick();
+            }
         }
+
         lastState = newState;
     }
 };
@@ -94,8 +102,13 @@ public:
 
     void loop()
     {
+        if (millis() - readTimer < READ_DELAY)
+            return;
+
         onOffButton.run();
         reduceBrightnessButton.run();
         increaseBrightnessButton.run();
+
+        readTimer = millis();
     }
 };
