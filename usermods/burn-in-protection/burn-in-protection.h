@@ -14,7 +14,7 @@ private:
 private:
     bool shouldReset()
     {
-        return strip.getBrightness() == 0 || effectCurrent == 0;
+        return strip.getBrightness() == 0;
     };
 
 public:
