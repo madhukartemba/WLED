@@ -10,10 +10,17 @@
 
   </p>
 
-# Welcome to my project WLED! ✨
+# Welcome to my project WLED Led Channel! ✨
 
 A fast and feature-rich implementation of an ESP32 and ESP8266 webserver to control NeoPixel (WS2812B, WS2811, SK6812) LEDs or also SPI based chipsets like the WS2801 and APA102!
 This is a fork of WLED which adds RD-03E radar sensor support and APDS 9930 ambient light sensor support as a usermod.
+
+## 📦 Installation
+- Pin used for LED data: GPIO 23 (default)
+- Pins used for Radar Sensor: RX 18, TX 19 (hardcoded)
+- Pins used for APDS 9930: SDA 21, SCL 22 (default I2C pins)
+- Pin used for analog mic: GPIO 34 (need to setup on reset)
+- LED Count: 827 (skip the first LED)
 
 ## ⚙️ Features
 - WS2812FX library with more than 100 special effects  
