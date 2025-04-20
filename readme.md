@@ -20,7 +20,7 @@ This is a fork of WLED which adds RD-03E radar sensor support and APDS 9930 ambi
 - Pins used for Radar Sensor: RX 18, TX 19 (hardcoded)
 - Pins used for APDS 9930: SDA 21, SCL 22 (default I2C pins)
 - Pin used for analog mic: GPIO 34 (need to setup on reset)
-- LED Count: 827 (skip the first LED)
+- LED Count: 827 (skip the first LED) (need to setup on reset)
 - Power supply max current: 30000mA (30A) (need to setup on reset)
 - Power supply voltage: 5V
 - Power supply type: 5V 30A power supply
