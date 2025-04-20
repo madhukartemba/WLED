@@ -25,7 +25,7 @@ private:
 
   unsigned long radarTimer = 0;
   bool humanPresentFlag = false;
-  unsigned long radarTimeout = 10000;
+  unsigned long radarTimeout = 60000;
 
   // Strings to reduce memory usage (used more than twice)
   static const char _name[];
