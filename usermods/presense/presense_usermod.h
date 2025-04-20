@@ -397,3 +397,6 @@ const char PresenseUsermod::_radarDistance[] PROGMEM = "radarDistance";
 const char PresenseUsermod::_radarLastSucessfulRead[] PROGMEM = "radarLastSucessfulRead";
 const char *const PresenseUsermod::_modes[] PROGMEM = {"RADAR_AND_LIGHT", "RADAR_ONLY", "LIGHT_ONLY"};
 const char *const PresenseUsermod::_radarStatuses[] PROGMEM = {"HUMAN_ABSENT", "HUMAN_MOVING", "HUMAN_PRESENT"};
+
+static PresenseUsermod presenseUsermod;
+REGISTER_USERMOD(presenseUsermod);

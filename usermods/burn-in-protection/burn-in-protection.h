@@ -78,3 +78,6 @@ public:
 const char *BurnInProtection::_name = "BurnInProtection";
 const char *BurnInProtection::_enabled = "enabled";
 const char *BurnInProtection::_resetLedDelay = "resetLedDelay";
+
+static BurnInProtection burnInProtection;
+REGISTER_USERMOD(burnInProtection);
